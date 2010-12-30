@@ -13,7 +13,7 @@ INSERT INTO constants VALUES("alpha", 0.2);
 /*import table*/
 DROP TABLE IF EXISTS communes;
 DROP TABLE IF EXISTS access;
-SELECT load_extension('./libsqlitefunctions.so');
+SELECT load_extension('../bin/libsqlitefunctions.so');
 CREATE TABLE communes(
        com_id integer,
        NAME_3 text ,
@@ -31,8 +31,7 @@ CREATE TABLE communes(
 
 .separator ","
 SELECT "importing job_commne.csv";
-.import job_commune.csv communes
-SELECT "imported job_commne.csv";
+.import "../Data/Hanoi/job_commune.csv" communes
 
 /* delete the first line which contains labels */
 
@@ -57,7 +56,7 @@ CREATE TABLE access (
 );
 
 SELECT "importing Potential_accessibility.csv";
-.import Potential_accessibility.csv access
+.import "../Data/Hanoi/Potential_accessibility.csv" access
 
 DELETE FROM access WHERE rowid = 1;
 
@@ -139,8 +138,8 @@ UPDATE communes
 SELECT "Dumping results";
 .header ON
 .separator ","
-.output jobs.csv
+.output "../Data/Hanoi/jobs.csv"
 select * from communes;
 
-.output access.csv
+.output "../Data/Hanoi/access.csv"
 select * from access;
