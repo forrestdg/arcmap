@@ -10,6 +10,7 @@ gp.Workspace = data_path
 conn = sqlite3.connect(os.path.join(data_path, "db.sqlite"
                                     ))
 cur  = conn.cursor()
+print "Creating communes table."
 ###############################################
 #  Communes table
 #
@@ -38,19 +39,22 @@ rows = gp.SearchCursor(shp_path, '','',
 row = rows.next()
 com_ids = []
 # loop though all rows
-while row:   
+while row:
+    wk_naam = row.WK_NAAM.replace(","," ")
     cmd = """
 INSERT INTO communes (com_id, name, 
                       population, nearest_centroid_id, labour, distance)
     VALUES (%d, "%s", %d, %d, %d, %f)
-"""%(int(row.FID_1), row.WK_NAAM, int(row.AANT_INW), int(row.FID_2), int(row.labour), float(row.distance)) 
+"""%(int(row.FID_1), wk_naam, int(row.AANT_INW), 
+     int(row.FID_2), int(row.labour), float(row.distance)) 
     try:
         conn.execute(cmd)
     except:
         raise Exception("""sql errors on "%s" """%cmd)
     com_ids.append(row.FID_1)
-    communes[row.FID_1] = [int(row.FID_1), row.WK_NAAM, int(row.AANT_INW), 
-                           int(row.FID_2), int(row.labour), float(row.distance),[]]
+    communes[row.FID_1] = [int(row.FID_1), wk_naam, int(row.AANT_INW), 
+                           int(row.FID_2), int(row.labour), 
+                           float(row.distance),[]]
     row = rows.next()
     
 conn.commit()
@@ -59,6 +63,7 @@ conn.commit()
 #  centroids table
 #
 centroids = {}
+print "Creating centroids table."
 conn.execute("DROP TABLE IF EXISTS centroids")
 cmd = """CREATE TABLE IF NOT EXISTS centroids(
        cen_id INTEGER PRIMARY KEY,
@@ -81,18 +86,19 @@ row = rows.next()
 
 # loop though all rows
 while row:
+    wk_naam = row.WK_NAAM.replace(","," ")
     cmd = """
 INSERT INTO centroids (cen_id, cen_no, cen_name, parent_com_name,
                        cen_jobs,  parent_com_id)
     VALUES (%d, %d, "%s","%s", %d, %d)
-"""%(int(row.FID_1), int(row.CENTROIDNR), row.NAME, row.WK_NAAM, 
+"""%(int(row.FID_1), int(row.CENTROIDNR), row.NAME, wk_naam, 
      int(row.No_jobs), int(row.FID_2))
     try:
         conn.execute(cmd)
     except:
         raise Exception("""sql errors on "%s" """%cmd)
     centroids[row.FID_1] = [int(row.FID_1), int(row.CENTROIDNR), 
-                            row.NAME, row.WK_NAAM, 
+                            row.NAME, wk_naam, 
                             int(row.No_jobs), int(row.FID_2)]
     communes[int(row.FID_2)][6].append(row.FID_1)
     row = rows.next()
@@ -128,7 +134,8 @@ conn.execute("DROP TABLE IF EXISTS access")
 cmd="""CREATE TABLE IF NOT EXISTS access(
        orig_id INTEGER,
        dest_id INTEGER,
-       transit_time REAL
+       transit_time_min REAL,
+       transit_time_sec REAL
 )"""
 try:
     conn.execute(cmd)
@@ -141,9 +148,8 @@ transit_times = {}
 ###############################################
 #  Read csv file to array
 #
-
-csv_reader = csv.reader(open(os.path.join(data_path, "1-1-2000-1-12004.csv"
-                                          )))
+input_file = sys.argv[1]
+csv_reader = csv.reader(open(os.path.join(data_path, input_file)))
 
 transit_time_matrix = []
 i = 0
@@ -181,18 +187,18 @@ for i in com_ids:
                 if t == 0:
                     break
         cmd = """
-INSERT INTO access (orig_id, dest_id, transit_time)
-    VALUES (%d, %d, %f)
-"""%(i,j,t)
+INSERT INTO access (orig_id, dest_id, transit_time_min, transit_time_sec)
+    VALUES (%d, %d, %f, %f)
+"""%(i,j,t, 60*t)
         try:
             conn.execute(cmd)
         except:
             raise Exception("""sql errors on "%s" """%cmd)
         if i != j:
             cmd = """
-    INSERT INTO access (orig_id, dest_id, transit_time)
-        VALUES (%d, %d, %f)
-    """%(j,i,t)
+    INSERT INTO access (orig_id, dest_id, transit_time_min, transit_time_sec)
+        VALUES (%d, %d, %f, %f)
+    """%(j,i,t, 60*t)
             try:
                 conn.execute(cmd)
             except:

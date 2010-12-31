@@ -32,10 +32,11 @@ CREATE TABLE access (
        orig_id integer,
        dest_id integer,
        Destinat_1 integer,
-       Transit_time real
+       Transit_time_min real
 );
 
 SELECT "importing Potential_accessibility.csv";
 .import "../Data/Hanoi/Potential_accessibility.csv" access
 
 DELETE FROM access WHERE rowid = 1;
+
