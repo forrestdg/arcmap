@@ -10,7 +10,6 @@ def select_input():
     print "Select csv to import:"
     for i,f in enumerate(csvs):
         print "%d. %s"%(i,f)
-    print "Default 0:"
     selected = None
     while not selected:        
         choice = raw_input()
