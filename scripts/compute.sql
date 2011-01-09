@@ -17,10 +17,10 @@ UPDATE  access SET dest_weighted_jobs = dest_jobs/time_alpha;
 UPDATE  access SET dest_weighted_labours = dest_labours/time_alpha;
 
 SELECT "Computing destinations jobs (beta)";
-UPDATE  access SET time_beta = ( SELECT exp(transit_time_min*
+UPDATE  access SET time_beta = ( SELECT power(transit_time_min,
                                      (SELECT c_val FROM constants
                                           WHERE c_key IS "beta") )) ;
-UPDATE  access SET dest_weighted_jobs_beta = dest_jobs*time_beta;
+UPDATE  access SET dest_weighted_jobs_beta = dest_jobs/time_beta;
 
 SELECT "Computing sum_weighted_jobs for all communes";
 UPDATE communes
