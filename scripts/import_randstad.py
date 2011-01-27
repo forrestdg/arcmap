@@ -1,4 +1,4 @@
-import arcgisscripting, os, sys
+import arcpy, os, sys
 import sqlite3, csv, glob
 
 def select_input():
@@ -29,12 +29,12 @@ def main():
 
     print "Selected %s"%input_csv
 
-    gp = arcgisscripting.create(9.3)
+    # arcpy = arcgisscripting.create(9.3)
 
     data_path = os.path.join(os.path.abspath(os.path.dirname(__file__)),
                              "..","Data","Randstad")
 
-    gp.Workspace = data_path
+    arcpy.env.Workspace = data_path
     conn = sqlite3.connect(os.path.join(data_path, "db.sqlite"
                                         ))
     cur  = conn.cursor()
@@ -61,7 +61,7 @@ def main():
     communes = {}
 
     shp_path = os.path.join(data_path, "Point_to_poly_closest.shp")
-    rows = gp.SearchCursor(shp_path, '','', 
+    rows = arcpy.SearchCursor(shp_path, '','', 
                            "FID_1;FID_2,WK_NAAM;AANT_INW;labour;distance")
 
     row = rows.next()
@@ -107,7 +107,7 @@ def main():
 
 
     shp_path = os.path.join(data_path, "Poly_to_point.shp")
-    rows = gp.SearchCursor(shp_path, '','', 
+    rows = arcpy.SearchCursor(shp_path, '','', 
                            "FID_1;CENTROIDNR;NAME;WK_NAAM,FID_2;No_jobs")
 
     row = rows.next()
@@ -180,10 +180,10 @@ def main():
 
     transit_time_matrix = []
     i = 0
-    print "Reading big csv file."
+    print "Reading %s."%input_csv
     for row in csv_reader:
         i += 1
-        if i % 100 == 0:
+        if i % 1000 == 0:
             print("Reading line %d"%i)
         float_row = [ float(e) for e in row ]
         transit_time_matrix.append(float_row)
