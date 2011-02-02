@@ -1,7 +1,7 @@
 import arcpy
 import os, sys
 
-RELOCATE_RATE = 0.25
+RELOCATE_RATE = 0.7
 LAYER_NAME = "HN_commune"
 def main():
     ws = r"C:\Documents and Settings\Pham Thi Hong Ha\Desktop\Scenarios.gdb"
@@ -24,6 +24,8 @@ def main():
     # update jobs for old and new centers
     rows = arcpy.UpdateCursor(LAYER_NAME)
     count = 0
+    grand_total     = 0
+    new_grand_total = 0
     for row in rows:
         if row.centres == "old":
             row.jobs_scenarios = (row.Total_job_commune 
@@ -39,9 +41,14 @@ def main():
                                        int(new_job_per_commune))
         else:
             row.jobs_scenarios = row.Total_job_commune
+        grand_total += row.Total_job_commune
+        new_grand_total += row.jobs_scenarios
         rows.updateRow(row) 
 
-
+    # sanity check
+    if grand_total != new_grand_total:
+        raise Exception("new_grand_total=%d while grand_total=%d"
+                        %(new_grand_total, grand_total))
 
 
 if __name__ == "__main__":
