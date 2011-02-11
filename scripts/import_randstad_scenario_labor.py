@@ -17,8 +17,8 @@ def main():
     rows = arcpy.SearchCursor(LAYER_NAME)
     for row in rows:
         cmd = """
-UPDATE communes SET total_jobs = %d WHERE com_id = %d;
-"""%(row.Jobs_scenarios, row.OBJECTID - 1 )
+UPDATE communes SET labour = %d WHERE com_id = %d;
+"""%(row.labor_scenario, row.OBJECTID - 1 )
         try:
             conn.execute(cmd)
         except:

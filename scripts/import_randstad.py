@@ -186,6 +186,10 @@ def main():
         if i % 1000 == 0:
             print("Reading line %d"%i)
         float_row = [ float(e) for e in row ]
+		
+		# the car matrix's unit is hour, NOT min
+        if input_csv == "1-1-2024-1-3-2004.csv":
+            float_row = [ 60*e for e in float_row ]
         transit_time_matrix.append(float_row)
     for i in com_ids:
         for j in com_ids:
