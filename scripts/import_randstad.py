@@ -46,6 +46,8 @@ def main():
     cmd = """CREATE TABLE IF NOT EXISTS communes(
            com_id INTEGER PRIMARY KEY,
            name TEXT,
+           city_name TEXT,
+           WK_CODE TEXT,
            population INTEGER,
            nearest_centroid_id INTEGER,
            distance FLOAT,
@@ -60,21 +62,26 @@ def main():
     conn.commit()
     communes = {}
 
+
+
     shp_path = os.path.join(data_path, "Point_to_poly_closest.shp")
     rows = arcpy.SearchCursor(shp_path, '','', 
-                           "FID_1;FID_2,WK_NAAM;AANT_INW;labour;distance")
+                           "FID_1;FID_2;GM_NAAM;WK_CODE;WK_NAAM;AANT_INW;labour;distance")
 
     row = rows.next()
     com_ids = []
+
     # loop though all rows
     while row:
         wk_naam = row.WK_NAAM.replace(","," ")
         cmd = """
-    INSERT INTO communes (com_id, name, 
-                          population, nearest_centroid_id, labour, distance)
-        VALUES (%d, "%s", %d, %d, %d, %f)
-    """%(int(row.FID_1), wk_naam, int(row.AANT_INW), 
-         int(row.FID_2), int(row.labour), float(row.distance)) 
+    INSERT INTO communes (com_id, name, city_name, WK_CODE, 
+                          population, nearest_centroid_id, 
+                          labour, distance)
+        VALUES (%d, "%s", "%s", "%s" ,%d, %d, %d, %f)
+    """%(int(row.FID_1), wk_naam, row.GN_NAAM, row.WK_CODE,
+         int(row.AANT_INW), int(row.FID_2), 
+         int(row.labour), float(row.distance)) 
         try:
             conn.execute(cmd)
         except:
