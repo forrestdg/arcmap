@@ -79,7 +79,7 @@ def main():
                           population, nearest_centroid_id, 
                           labour, distance)
         VALUES (%d, "%s", "%s", "%s" ,%d, %d, %d, %f)
-    """%(int(row.FID_1), wk_naam, row.GN_NAAM, row.WK_CODE,
+    """%(int(row.FID_1), wk_naam, row.GM_NAAM, row.WK_CODE,
          int(row.AANT_INW), int(row.FID_2), 
          int(row.labour), float(row.distance)) 
         try:
