@@ -1,5 +1,3 @@
-import import_randstad
-import arcpy
 import sqlite3
 import sys, os
 import pprint
@@ -18,9 +16,6 @@ def main():
 
     conn = sqlite3.connect(os.path.join(data_path, "db.sqlite"
                                         ))
-    import_randstad.main()
-
-
     # get city_dict 
     # example: {"Amsterdam":"1, 4, 6...", "Rotterdam": "5, 9"}
     # where 1,4,6 are id of communes inside amsterdam

@@ -1,0 +1,4 @@
+import import_randstad
+import update_randstad_scenario_labor
+import_randstad.main()
+update_randstad_scenario_labor.main()

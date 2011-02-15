@@ -20,7 +20,7 @@ def main():
             BETA = float(row[1])
         elif row[0] == 'Tmax':
             TMAX = float(row[1])
-    
+
     cmd = "SELECT max(com_id) FROM communes"
     cursor.execute(cmd)
     com_id_max = int(cursor.fetchone()[0])
@@ -34,7 +34,7 @@ def main():
     sum_weighted_jobs    = N*[0]
     sum_weighted_labours  = N*[0]
 
-    time_matrix          = []    
+    time_matrix          = []
     time_matrix_alpha    = []
     time_matrix_beta     = []
     dest_weighted_jobs   = []
@@ -58,17 +58,18 @@ def main():
     for row in cursor:
         oid = int(row[0])
         did = int(row[1])
-        t = float(row[2])        
+        t = float(row[2])
         line = time_matrix[oid]
         line[did] = t
-
+        if t < 1:
+            t = 1
         line_alpha = time_matrix_alpha[oid]
         line_alpha[did] = t**ALPHA
 
         line_beta = time_matrix_beta[oid]
         line_beta[did] = t**BETA
 
-        
+
 
     # i: orig
     # j: dest
@@ -94,6 +95,9 @@ def main():
                                         competition_factors[j])
 
     # update back to jobs table
+    for id in com_ids:
+        print accessibility_alphas[id], accessibility_betas[id], competition_factors[id]
+    return
     for com_id in com_ids:
         cmd = ("UPDATE communes SET accessibility_alpha = %f WHERE com_id = %d"%(
                 accessibility_alphas[com_id], com_id))

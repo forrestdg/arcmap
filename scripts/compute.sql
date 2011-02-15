@@ -9,6 +9,8 @@ UPDATE access
     SET dest_labours = (SELECT labour
                             FROM communes WHERE com_id = dest_id );
 
+UPDATE  access SET transit_time_min = 1 WHERE transit_time_min < 1;
+
 SELECT "Computing destinations jobs and labours (alpha)";
 UPDATE  access SET time_alpha = ( SELECT power(transit_time_min,
                                      (SELECT c_val FROM constants

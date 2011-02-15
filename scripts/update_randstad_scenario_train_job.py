@@ -1,4 +1,4 @@
-import import_randstad_scenario_train
+import update_randstad_scenario_train
 import arcpy
 import sqlite3
 import sys, os
@@ -12,8 +12,7 @@ def main():
     conn = sqlite3.connect(os.path.join(data_path, "db.sqlite"
                                         ))
 
-    # import/modify transit times according to scenario 3
-    import_randstad_scenario_train.main()
+    update_randstad_scenario_train.main()
 
     print "Changing job according to scenario 1 - Randstad"
     ws = r"C:\Documents and Settings\Pham Thi Hong Ha\Desktop\Scenarios.gdb"
