@@ -80,7 +80,7 @@ def main():
             if time_matrix_alpha[i][j] > TMAX or time_matrix_alpha[i][j] == 0:
                 continue
             sum_weighted_jobs[i]    += com_jobs[j]/time_matrix_alpha[i][j]
-            sum_weighted_labours[j] += com_labours[j]/time_matrix_alpha[i][j]
+            sum_weighted_labours[i] += com_labours[j]/time_matrix_alpha[i][j]
 
         if sum_weighted_labours[i] > 0:
             competition_factors[i] = sum_weighted_jobs[i]/sum_weighted_labours[i]
