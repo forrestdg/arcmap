@@ -97,18 +97,18 @@ def main():
             time_gain = None
             for hs_orig,hs_dest, hs_time in HS_links:
                 # skip if hispeed time > current travel time
-                if time_matrix[i][j] <= hs_time:
+                if old_time <= hs_time:
                     continue
 
                 # skip if hispeed time + time travel to hs_origin 
                 #      > current travel time
                 new_time = time_matrix[i][hs_orig] + hs_time
-                if time_matrix[i][j] <= new_time:
+                if old_time <= new_time:
                     continue
 
                 # skip total_time > current travel time
                 new_time = time_matrix[hs_dest][j] + new_time
-                if time_matrix[i][j] <= new_time:
+                if old_time <= new_time:
                     continue
 
                 if i == hs_orig or j == hs_dest:
@@ -124,19 +124,14 @@ def main():
                 time_matrix[i][j] = new_time
                 time_matrix[j][i] = new_time
 
-                if i == hs_orig or j == hs_dest:
-                    stops = 1
-                else:
-                    stops = 2
-
                 time_gain = (i,j,old_time - new_time, hs_orig, hs_dest, stops)
 
             if time_gain:
                 time_gains.append(time_gain)
                 if stops == 1:
-                    one_stops +=1
+                    one_stops +=2
                 else:
-                    two_stops +=1
+                    two_stops +=2
     # print statistics:
     print "No of improved connections: %d"%(2*len(time_gains))
     print "  Of those: %d 1-stop and %d 2-stop connections"%(one_stops, two_stops)
