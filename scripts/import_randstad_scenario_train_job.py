@@ -6,6 +6,9 @@ import pprint
 import re
 
 def main():
+    data_path = os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                             "..","Data","Randstad")
+
     conn = sqlite3.connect(os.path.join(data_path, "db.sqlite"
                                         ))
 
