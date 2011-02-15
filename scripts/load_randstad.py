@@ -1,7 +1,8 @@
 import arcpy, os, sys
 import sqlite3, csv, glob
 
-def load(db_file, network_csv):
+def load(db_file, network_csv):    
+
     data_path = os.path.join(os.path.abspath(os.path.dirname(__file__)),
                              "..","Data","Randstad")
 

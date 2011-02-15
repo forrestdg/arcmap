@@ -10,12 +10,12 @@ HI_SPEED_STATIONS = [ "WK036300", # Amsterdam:
                       "WK034406", # Utrecht
                       ]
 CONNECTION_TIME = 2 # suppose that each connection through the HISPEED line takes 2 min.
-def main():
+
+def update(db_file):
+    conn = sqlite3.connect(db_file)
     data_path = os.path.join(os.path.abspath(os.path.dirname(__file__)),
                              "..","Data","Randstad")
 
-    conn = sqlite3.connect(os.path.join(data_path, "db.sqlite"
-                                        ))
     # get city_dict 
     # example: {"Amsterdam":"1, 4, 6...", "Rotterdam": "5, 9"}
     # where 1,4,6 are id of communes inside amsterdam
@@ -173,6 +173,9 @@ def main():
                     raise Exception("""sql errors on "%s" """%cmd)
         conn.commit()
     return
+
+def main():
+    update(sys.argv[1])
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -4,8 +4,7 @@ import sys, os
 import pprint
 import re
 
-def main():
-    data_file = sys.argv[1]
+def compute(data_file):
     conn = sqlite3.connect(data_file)
 
     cursor = conn.cursor()
@@ -95,9 +94,9 @@ def main():
                                         competition_factors[j])
 
     # update back to jobs table
-    for id in com_ids:
-        print accessibility_alphas[id], accessibility_betas[id], competition_factors[id]
-    return
+    # for id in com_ids:
+    #    print accessibility_alphas[id], accessibility_betas[id], competition_factors[id]
+    # return
     for com_id in com_ids:
         cmd = ("UPDATE communes SET accessibility_alpha = %f WHERE com_id = %d"%(
                 accessibility_alphas[com_id], com_id))
@@ -112,5 +111,8 @@ def main():
         conn.execute(cmd)
     conn.commit()
 
+def main():
+    data_file = sys.argv[1]
+    compute(data_file)
 if __name__ == "__main__":
     sys.exit(main())
