@@ -9,7 +9,7 @@ set FILES=1-4-2-1-23-5.csv
 set ALPHAS=0.4
 set TMAXES=90
 FOR %%f in (%FILES%) do (
-    "C:\Python26\ArcGIS10.0\python.exe" ..\scripts\import_randstad_scenario_trainspeed.py %%f
+    "C:\Python26\ArcGIS10.0\python.exe" ..\scripts\import_randstad_scenario_train.py %%f
     sqlite3.exe ..\Data\Randstad\db.sqlite <..\scripts\add_columns.sql
     sqlite3.exe ..\Data\Randstad\db.sqlite <..\scripts\param_randstad.sql
     FOR %%a in (%ALPHAS%) DO (
