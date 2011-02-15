@@ -17,7 +17,7 @@ FOR %%f in (%FILES%) do (
             sqlite3.exe  ..\Data\Randstad\db.sqlite "UPDATE constants SET c_val = %%a WHERE c_key IN ('alpha', 'beta')"		
             sqlite3.exe  ..\Data\Randstad\db.sqlite "UPDATE constants SET c_val = %%t WHERE c_key IS 'Tmax'"		
 	    sqlite3.exe ..\Data\Randstad\db.sqlite "SELECT * FROM constants"
-	    ..\scripts\compute.py ..\Data\Randstad\db.sqlite
+	    sqlite3.exe ..\Data\Randstad\db.sqlite <..\scripts\compute.sql
 	    sqlite3.exe ..\Data\Randstad\db.sqlite <..\scripts\export_randstad.sql
 	    move ..\Data\Randstad\jobs.csv ..\data\Randstad\results\jobs___%%t_%%a_%%f
             move ..\Data\Randstad\access.csv ..\data\Randstad\results\access__%%t_%%a_%%f
