@@ -1,11 +1,6 @@
 import sys, os, csv, pprint
 import shutil
-import load_hanoi
 import sqlite3
-print "Importing arcpy..."
-import arcpy
-print "Imported arcpy..."
-import load_randstad 
 import compute
 def main():
     if sys.argv[1:]:
@@ -22,6 +17,7 @@ def main():
     col_map = {}
     reader = csv.DictReader(open(input_file))
     results = {"Hanoi":{}, "Randstad":{}}
+    csvs = {"Hanoi":{}, "Randstad":{}}
 
     for row in reader:
         area          = row['Area']
@@ -36,6 +32,7 @@ def main():
         access_beta  = row['access_beta']
         run          = row['Run']
         layername          = row['Layername']
+        csvs[area][scenario] = (network_csv, job_csv)
         if area not in ["Hanoi", "Randstad"]:
             raise Exception("Unrecognized zone %s"%area)
 
@@ -63,19 +60,26 @@ def main():
         
         # if db_file not exists, then try to create it
         if not os.path.exists(db_file):
-            # if the db_file_0 does not exists either
-            if not  os.path.exists(db_file_0):
+            # if db_file_0 exists and scenario 0 use the same csvs
+            if ( scenario != "0" and os.path.exists(db_file_0) 
+                 and csvs[area].has_key("0")
+                 and csvs[area]["0"] == csvs[area][scenario]
+                 ):
+                shutil.copyfile(db_file_0, db_file)
+            # load a fresh db
+            else:
                 if area == "Hanoi":
-                    load_hanoi.load(db_file_0, network_csv, job_csv)
+                    print "loading %s, %s"%(network_csv, job_csv)
+                    import load_hanoi
+                    load_hanoi.load(db_file, network_csv, job_csv)
                 else:
-                    load_randstad.load(db_file_0, network_csv)
+                    import load_randstad
+                    load_randstad.load(db_file, network_csv)
                 # add columns and constants table
-                conn = sqlite3.connect(db_file_0)
+                conn = sqlite3.connect(db_file)
                 conn.executescript(open("add_columns.sql").read())
                 conn.commit()
             # clone db_file from db_file_0
-            if scenario != "0":
-                shutil.copyfile(db_file_0, db_file)
             
             # update according to scenario if needed
             if scenario != "0" and update_module !="":
@@ -112,7 +116,6 @@ def main():
             for row in cursor:
                 results[area]["ID_4"].append(int(row[0]))
 
-
         results[area][access_alpha] = []
         results[area][access_beta] = []            
         cursor.execute("SELECT accessibility_alpha, accessibility_beta FROM communes ORDER BY com_id")
@@ -121,6 +124,7 @@ def main():
             results[area][access_beta].append(int(row[1]))
         print "Finished %s,%s scenario %s, alpha=%s, Tmax=%s"%(area, Type, scenario, alpha, Tmax)
         print "Updating to %s"%layername
+        import arcpy
         if area == "Hanoi":
             index_dict = {}
             for i,com_id in enumerate(results['Hanoi']['com_id']):
