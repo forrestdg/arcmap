@@ -2,6 +2,9 @@ import sys, os, csv, pprint
 import shutil
 import load_hanoi
 import sqlite3
+print "Importing arcpy..."
+import arcpy
+print "Imported arcpy..."
 import load_randstad 
 import compute
 def main():
@@ -32,6 +35,7 @@ def main():
         access_alpha  = row['access_alpha']
         access_beta  = row['access_beta']
         run          = row['Run']
+        layername          = row['Layername']
         if area not in ["Hanoi", "Randstad"]:
             raise Exception("Unrecognized zone %s"%area)
 
@@ -99,9 +103,9 @@ def main():
 
         if area == "Randstad" and "WK_CODE" not in results[area].keys():
             results[area]["WK_CODE"] = []
-            cursor.execute("SELECT WK_CONDE FROM communes ORDER BY com_id")
+            cursor.execute("SELECT WK_CODE FROM communes ORDER BY com_id")
             for row in cursor:
-                results[area]["WK_CODE"].append(int(row[0]))
+                results[area]["WK_CODE"].append(row[0])
         if area == "Hanoi" and "ID_4" not in results[area].keys():
             results[area]["ID_4"] = []
             cursor.execute("SELECT ID_4 FROM communes ORDER BY com_id")
@@ -116,13 +120,51 @@ def main():
             results[area][access_alpha].append(int(row[0]))
             results[area][access_beta].append(int(row[1]))
         print "Finished %s,%s scenario %s, alpha=%s, Tmax=%s"%(area, Type, scenario, alpha, Tmax)
+        print "Updating to %s"%layername
+        if area == "Hanoi":
+            index_dict = {}
+            for i,com_id in enumerate(results['Hanoi']['com_id']):
+                id4 = results['Hanoi']['ID_4']
+                index_dict[id4] = i
+
+            rows = arcpy.UpdateCursor(layername)
+            for row in rows:
+                id4 = row.ID_4
+                exec("row.%s = results['Hanoi'][%s][%d]"%(access_alpha,
+                                                          access_alpha,
+                                                          id4
+                                                          ))
+                exec("row.%s = results['Hanoi'][%s][%d]"%(access_beta,
+                                                          access_beta,
+                                                          id4
+                                                          ))
+                rows.update(row)
+        elif area == "Randstad":
+            index_dict = {}
+            for i,com_id in enumerate(results['Randstad']['com_id']):
+                wkcode = results['Randstad']['WK_CODE']
+                index_dict[wkcode] = i
+
+            rows = arcpy.UpdateCursor(layername)
+            for row in rows:
+                wkcode = row.WK_CODE
+                exec("row.%s = results['Randstad'][%s][%d]"%(access_alpha,
+                                                          access_alpha,
+                                                          wkcode
+                                                          ))
+                exec("row.%s = results['Randstad'][%s][%d]"%(access_beta,
+                                                          access_beta,
+                                                          wkcode
+                                                          ))
+                rows.update(row)
+
         # output to csv
-        for area in ("Hanoi", "Randstad"):
-            rs = results[area]
+        for an_area in ("Hanoi", "Randstad"):
+            rs = results[an_area]
             keys = sorted(rs.keys())
             if len(keys) == 0:
                 continue
-            csv_file = os.path.join(results_path, "%s.csv"%area)
+            csv_file = os.path.join(results_path, "%s.csv"%an_area)
             f = open(csv_file, 'w')
             writer = csv.writer(f)
             writer.writerow(keys)
