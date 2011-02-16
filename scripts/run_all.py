@@ -124,39 +124,41 @@ def main():
         if area == "Hanoi":
             index_dict = {}
             for i,com_id in enumerate(results['Hanoi']['com_id']):
-                id4 = results['Hanoi']['ID_4']
+                id4 = results['Hanoi']['ID_4'][i]
                 index_dict[id4] = i
 
             rows = arcpy.UpdateCursor(layername)
             for row in rows:
                 id4 = row.ID_4
-                exec("row.%s = results['Hanoi'][%s][%d]"%(access_alpha,
+                idx = index_dict[id4]
+                exec("row.%s = results['Hanoi']['%s'][%d]"%(access_alpha,
                                                           access_alpha,
-                                                          id4
+                                                          idx
                                                           ))
-                exec("row.%s = results['Hanoi'][%s][%d]"%(access_beta,
+                exec("row.%s = results['Hanoi']['%s'][%d]"%(access_beta,
                                                           access_beta,
-                                                          id4
+                                                          idx
                                                           ))
-                rows.update(row)
+                rows.updateRow(row)
         elif area == "Randstad":
             index_dict = {}
             for i,com_id in enumerate(results['Randstad']['com_id']):
-                wkcode = results['Randstad']['WK_CODE']
+                wkcode = results['Randstad']['WK_CODE'][i]
                 index_dict[wkcode] = i
 
             rows = arcpy.UpdateCursor(layername)
             for row in rows:
                 wkcode = row.WK_CODE
-                exec("row.%s = results['Randstad'][%s][%d]"%(access_alpha,
+                idx = index_dict[wkcode]
+                exec("row.%s = results['Randstad']['%s'][%d]"%(access_alpha,
                                                           access_alpha,
-                                                          wkcode
+                                                          idx
                                                           ))
-                exec("row.%s = results['Randstad'][%s][%d]"%(access_beta,
+                exec("row.%s = results['Randstad']['%s'][%d]"%(access_beta,
                                                           access_beta,
-                                                          wkcode
+                                                          idx
                                                           ))
-                rows.update(row)
+                rows.updateRow(row)
 
         # output to csv
         for an_area in ("Hanoi", "Randstad"):
