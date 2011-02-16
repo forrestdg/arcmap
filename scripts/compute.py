@@ -69,7 +69,6 @@ def compute(data_file):
         line_beta[did] = t**BETA
 
 
-
     # i: orig
     # j: dest
     for i in range(N):
@@ -77,7 +76,7 @@ def compute(data_file):
             if time_matrix_beta[i][j] > 0:
                 accessibility_betas[i] += com_jobs[j]/time_matrix_beta[i][j]
 
-            if time_matrix_alpha[i][j] > TMAX or time_matrix_alpha[i][j] == 0:
+            if time_matrix[i][j] > TMAX or time_matrix_alpha[i][j] == 0:
                 continue
             sum_weighted_jobs[i]    += com_jobs[j]/time_matrix_alpha[i][j]
             sum_weighted_labours[i] += com_labours[j]/time_matrix_alpha[i][j]
@@ -88,8 +87,9 @@ def compute(data_file):
 
     for i in range(N):
         for j in range(N):
-            if time_matrix_alpha[i][j] > TMAX or time_matrix_alpha[i][j] == 0:
+            if time_matrix[i][j] > TMAX or time_matrix_alpha[i][j] == 0:
                 continue
+			
             accessibility_alphas[i] += (com_jobs[j]/time_matrix_beta[i][j]*
                                         competition_factors[j])
 

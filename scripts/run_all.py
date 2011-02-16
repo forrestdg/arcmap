@@ -2,7 +2,7 @@ import sys, os, csv, pprint
 import shutil
 import load_hanoi
 import sqlite3
-#import load_randstad 
+import load_randstad 
 import compute
 def main():
     if sys.argv[1:]:
@@ -31,13 +31,17 @@ def main():
         update_module = row['Update script'].replace(".py","")
         access_alpha  = row['access_alpha']
         access_beta  = row['access_beta']
-
+        run          = row['Run']
         if area not in ["Hanoi", "Randstad"]:
             raise Exception("Unrecognized zone %s"%area)
 
         if scenario == "0" and update_module != "":
             raise Exception("scenario must be non-scenario by convention! No update script allowed")
 
+        if run != "x" or access_alpha == "":
+            print "Skipping %s,%s scenario %s, alpha=%s, Tmax=%s"%(area, Type, scenario, alpha, Tmax)
+            continue
+        
         db_file   = os.path.join(results_path, 
                                  "%s_%s_%s.sqlite"%(area, Type, scenario))
         db_file_0 = os.path.join(results_path, 
@@ -45,8 +49,8 @@ def main():
 
         # load network and job into database
         # if None of the files exists:        
-        network_csv = os.path.join(data_path, area, network_csv)
-        job_csv = os.path.join(data_path, area, job_csv)
+        network_csv = os.path.join(data_path, area, "source", network_csv)
+        job_csv = os.path.join(data_path, area, "source", job_csv)
 
         if not os.path.exists(network_csv):
             raise Exception("missing network_csv %s"%network_csv)
@@ -70,7 +74,7 @@ def main():
                 shutil.copyfile(db_file_0, db_file)
             
             # update according to scenario if needed
-            if scenario != "0" and "update_module":
+            if scenario != "0" and update_module !="":
                 updater = __import__(update_module)
                 updater.update(db_file)
         
@@ -95,9 +99,14 @@ def main():
 
         if area == "Randstad" and "WK_CODE" not in results[area].keys():
             results[area]["WK_CODE"] = []
-            cursor.execute("SELECT com_id FROM communes ORDER BY com_id")
+            cursor.execute("SELECT WK_CONDE FROM communes ORDER BY com_id")
             for row in cursor:
                 results[area]["WK_CODE"].append(int(row[0]))
+        if area == "Hanoi" and "ID_4" not in results[area].keys():
+            results[area]["ID_4"] = []
+            cursor.execute("SELECT ID_4 FROM communes ORDER BY com_id")
+            for row in cursor:
+                results[area]["ID_4"].append(int(row[0]))
 
 
         results[area][access_alpha] = []
@@ -106,7 +115,7 @@ def main():
         for row in cursor:
             results[area][access_alpha].append(int(row[0]))
             results[area][access_beta].append(int(row[1]))
-        print "Finished %s, scenario %s, alpha=%s, Tmax=%s"%(area, scenario, alpha, Tmax)
+        print "Finished %s,%s scenario %s, alpha=%s, Tmax=%s"%(area, Type, scenario, alpha, Tmax)
         # output to csv
         for area in ("Hanoi", "Randstad"):
             rs = results[area]

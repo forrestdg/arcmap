@@ -9,7 +9,7 @@ def load(db_file, network_csv):
     
     conn = sqlite3.connect(db_file)
     cur  = conn.cursor()
-    print "Creating communes table."
+    # print "Creating communes table."
     ###############################################
     #  Communes table
     #
@@ -69,7 +69,7 @@ def load(db_file, network_csv):
     #  centroids table
     #
     centroids = {}
-    print "Creating centroids table."
+    #  print "Creating centroids table."
     conn.execute("DROP TABLE IF EXISTS centroids")
     cmd = """CREATE TABLE IF NOT EXISTS centroids(
            cen_id INTEGER PRIMARY KEY,
@@ -154,7 +154,7 @@ def load(db_file, network_csv):
     ###############################################
     #  Read csv file to array
     #
-    csv_reader = csv.reader(open(os.path.join(data_path, network_csv)))
+    csv_reader = csv.reader(network_csv)))
 
     transit_time_matrix = []
     i = 0
@@ -166,7 +166,8 @@ def load(db_file, network_csv):
         float_row = [ float(e) for e in row ]
 		
 		# the car matrix's unit is hour, NOT min
-        if network_csv == "1-1-2024-1-3-2004.csv":
+        if os.path.basename(r"%s"%network_csv) == "1-1-2024-1-3-2004.csv":
+            print "changing from hour to min (%s)%network_csv"
             float_row = [ 60*e for e in float_row ]
         transit_time_matrix.append(float_row)
     for i in com_ids:

@@ -155,6 +155,7 @@ def update(db_file):
     N= len(time_matrix)
     count = 0
     conn.execute("DELETE FROM access")
+    conn.commit()
     for i in range(N):
         for j in range(N):
             count += 1

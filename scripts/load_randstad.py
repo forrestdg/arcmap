@@ -155,7 +155,7 @@ def load(db_file, network_csv):
     ###############################################
     #  Read csv file to array
     #
-    csv_reader = csv.reader(open(os.path.join(data_path, network_csv)))
+    csv_reader = csv.reader(open(network_csv))
 
     transit_time_matrix = []
     i = 0
@@ -163,11 +163,11 @@ def load(db_file, network_csv):
     for row in csv_reader:
         i += 1
         if i % 1000 == 0:
-            print("Reading line %d"%i)
+            print("Reading line %d"%i)        
         float_row = [ float(e) for e in row ]
-		
-		# the car matrix's unit is hour, NOT min
-        if network_csv == "1-1-2024-1-3-2004.csv":
+       	
+        # the car matrix's unit is hour, NOT min
+        if os.path.basename(network_csv) == "1-1-2024-1-3-2004.csv":
             float_row = [ 60*e for e in float_row ]
         transit_time_matrix.append(float_row)
     for i in com_ids:
